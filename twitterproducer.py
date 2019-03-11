@@ -4,13 +4,11 @@ from tweepy.streaming import StreamListener
 from kafka import KafkaProducer
 from kafka import SimpleProducer, KafkaClient
 import twitter_config
-from datetime import datetime
 
 
 def datasend(data):
     rawtweet = json.loads(data)
     tweet={}
-    #tweet["id"] = rawtweet["id"]
     tweet["text"] = rawtweet["text"]
     return json.dumps(tweet)
 
@@ -23,7 +21,6 @@ class TwitterListener(StreamListener):
         try:
             newdata = datasend(data)
             self.producer.send('twitter', newdata)
-            print newdata
             return True
         except KeyError:
             return True
@@ -46,7 +43,7 @@ if __name__ == "__main__":
     api = tweepy.API(auth)
 
     stream = tweepy.Stream(auth, listener=TwitterListener(api))
-    WORDS_TO_TRACK = ["Bernie"]
+    WORDS_TO_TRACK = ["Bernie","Kamala","Biden"]
     while True:
         try:
             stream.filter(languages=["en"], track=WORDS_TO_TRACK)

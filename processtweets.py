@@ -1,17 +1,13 @@
 import json
-import re
 from kafka import KafkaConsumer
 from pyspark import SparkContext, SparkConf
 from pyspark.streaming import StreamingContext
 from pyspark.streaming.kafka import KafkaUtils
-from textblob import TextBlob
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
-from pyspark.sql import SQLContext, Row
-from pyspark.sql.functions import lit
-from pyspark.sql.functions import udf
-import sys
-import datetime
+from pyspark.sql import SQLContext
+import re
+from textblob import TextBlob
 
 
 def clean_tweet(tweet):
@@ -25,7 +21,6 @@ def sentiment(tweet):
 		return 'neutral'
 	else:
 		return 'negative'
-
 
 def get_candidate(text):
 	if "kamala" in text.lower():
@@ -42,12 +37,6 @@ def getSqlContextInstance(sparkContext):
         globals()['sqlContextSingletonInstance'] = SQLContext(sparkContext)
     return globals()['sqlContextSingletonInstance']
 
-
-def extract(tweet):
-	data = {'text': tweet['text']}
-	data['candidate'] = get_candidate(tweet['text'])
-	data['sentiment'] = sentiment(tweet['text'])
-	return json.dumps(data)
 
 
 def getElastic():
@@ -78,35 +67,31 @@ def send_elastic(doc, index, type):
 	        print(response)
 	    else:
 	        i+=1
-	return statcnt
+	return i
 
 
 def process(time, rdd):
-	print("========= %s =========" % str(time))
-	try:
-		sqlContext = getSqlContextInstance(rdd.context)
-		df = sqlContext.read.json(rdd)
-		#udf_func = udf(lambda x: sentiment(x),returnType=StringType())
-		#df = df.withColumn("sentiment",lit(udf_func(df.text)))
-		results = df.toJSON().map(lambda j: json.loads(j)).collect()
-		#for result in results:
-		# 	result["candidate"]=json.loads(get_candidate(result['text']))
-		# 	result["sentiment"]=json.loads(result["sentiment"])
-		send_elastic(results,"test18","document")
-	except:
-		pass
+    print("========= %s =========" % str(time))
+    try:
+        sqlContext = getSqlContextInstance(rdd.context)
+        df = sqlContext.read.json(rdd)
+        results = df.toJSON().map(lambda j: json.loads(j)).collect()
+        send_elastic(results,"index1","document")
+    except:
+        pass
 
 
 def main():
-	createIndex("test18")
-	sc = SparkContext(appName="PythonStreaming", master="local[2]")
-	sqlContext = SQLContext(sc)
-	ssc = StreamingContext(sc, 10)
-	kafkaStream = KafkaUtils.createStream(ssc, 'localhost:2181', 'spark-streaming', {'twitter':1})
-	tweets = kafkaStream.map(lambda x: json.loads(x[1]))
-	tweets.foreachRDD(process)
-	ssc.start()
-	ssc.awaitTermination()
+    createIndex("index1")
+    sc = SparkContext(appName="PythonStreaming", master="local[2]")
+    sqlContext = SQLContext(sc)
+    ssc = StreamingContext(sc, 10)
+    kafkaStream = KafkaUtils.createStream(ssc, 'localhost:2181', 'spark-streaming', {'twitter':1})
+    tweets = kafkaStream.map(lambda x: json.loads(x[1])).map(lambda x: json.loads(x))
+    sentiments = tweets.map(lambda x: {'tweet': x['text'],'candidate': get_candidate(x['text']),'sentiment':sentiment(x['text'])})
+    sentiments.foreachRDD(process)
+    ssc.start()
+    ssc.awaitTermination()
 
 if __name__=="__main__":
     main()
