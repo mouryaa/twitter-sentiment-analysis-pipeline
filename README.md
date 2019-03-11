@@ -4,7 +4,7 @@ The goal of this project was to build a real time streaming data pipeline to rea
 
 ## Architecture
 
-</br><img src="architecture.png" width="800" height=auto />
+   </br><img src="architecture.png" width="800" height=auto />
 
 The kafka producer starts retrieving tweets using the Twitter API for the terms that I entered and it is consumed by Spark where they are processed and sent to elatsticsearch and can be viewed in Kibana.
 
@@ -28,3 +28,4 @@ python twitterproducer.py
 ```
 spark-submit --jars elasticsearch-hadoop-2.0.2.jar,spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar ./processtweets.py
 ```
+ 
