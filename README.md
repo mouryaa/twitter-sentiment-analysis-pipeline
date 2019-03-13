@@ -26,6 +26,6 @@ python twitterproducer.py
 ```
 4. Run script to process tweets
 ```
-spark-submit --jars elasticsearch-hadoop-2.0.2.jar,spark-streaming-kafka-0-8-assembly_2.11-2.4.0.jar ./processtweets.py
+spark-submit --jars '/paths to jars' ./processtweets.py
 ```
  
