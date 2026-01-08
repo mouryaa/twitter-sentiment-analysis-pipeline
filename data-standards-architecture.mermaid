@@ -1,97 +1,103 @@
-graph TB
-    subgraph "Data Sources (Disparate Teams)"
-        DS1[Relational Databases]
-        DS2[Data Lakes/Object Storage]
-        DS3[APIs/Microservices]
-        DS4[File Systems CSV/JSON/Parquet]
-        DS5[NoSQL Databases]
-        DS6[Data Warehouses]
-    end
+flowchart LR
 
-    subgraph "Extraction Layer"
-        ME[Metadata Extraction Tools]
-        SI[Schema Inference Tools]
-        AP[API Documentation Generators]
-        DP[Database Profiling Tools]
-        LT[Lineage Tracking Tools]
-    end
+%% =======================
+%% Domain Layer
+%% =======================
+subgraph Domain["Domain Data Sources (Decentralized)"]
+    DB[(Operational Databases)]
+    DL[(Data Lake Tables)]
+    DW[(Data Warehouse)]
+    ST[(Streaming & Events)]
+    API[(APIs & Services)]
+end
 
-    subgraph "Transformation & Mapping Layer"
-        MM[Metadata Management Framework]
-        MT[Mapping Templates DCAT/DPROD/ODRL]
-        VE[Validation Engine]
-        ER[Enrichment Rules]
-    end
+%% =======================
+%% Extraction Layer
+%% =======================
+subgraph Extract["Metadata & Model Extraction"]
+    SCHEMA[Schema & Structure\nExtractors]
+    PIPE[Pipeline & Query\nParsers]
+    LINEAGE[Lineage & Provenance\nCollectors]
+end
 
-    subgraph "Integration & Orchestration"
-        ETL[ETL/Data Integration Platform]
-        WF[Workflow Orchestrator]
-        API_GW[API Gateway]
-    end
+%% =======================
+%% Normalization Layer
+%% =======================
+subgraph Normalize["Canonical Modeling & Normalization"]
+    LOGICAL[Logical & Semantic\nModel Mapping]
+    GLOSSARY[Business Glossary\nAlignment]
+    SERIALIZE[Metadata Serialization\n]
+end
 
-    subgraph "Publishing Layer"
-        PUB[Publishing Service]
-        QC[Quality Control]
-        VER[Version Control]
-    end
+%% =======================
+%% Governance Layer
+%% =======================
+subgraph Govern["Governance, Policy & Contracts"]
+    ODRL[Usage Policies\n]
+    CONTRACTS[Data Contracts\n]
+    OWNERS[Ownership & Stewardship]
+end
 
-    subgraph "Centralized Data Catalog"
-        CAT[Data Catalog DCAT Compliant]
-        DP_REG[Data Product Registry DPROD]
-        POL[Policy Repository ODRL]
-        SEARCH[Search & Discovery]
-    end
+%% =======================
+%% Validation Layer
+%% =======================
+subgraph Validate["Validation & Certification"]
+    SHACL[Standards Validation\n]
+    RULES[Quality & Completeness\nRules]
+end
 
-    subgraph "Governance & Monitoring"
-        GOV[Governance Dashboard]
-        COMP[Compliance Monitoring]
-        AUDIT[Audit Logs]
-    end
+%% =======================
+%% Graph Backbone
+%% =======================
+subgraph Graph["Metadata Graph Backbone"]
+    KG[(Knowledge / Metadata Graph)]
+    PROV[Provenance & Lineage\n]
+end
 
-    DS1 --> ME
-    DS2 --> ME
-    DS3 --> AP
-    DS4 --> SI
-    DS5 --> DP
-    DS6 --> DP
-    
-    DS1 --> LT
-    DS2 --> LT
-    ETL --> LT
+%% =======================
+%% Consumption Layer
+%% =======================
+subgraph Consume["Publishing & Consumption"]
+    CATALOG[Central Data Catalog]
+    SEARCH[Discovery & Search]
+    ACCESS[Policy-Aware\nAccess Workflows]
+    APIS[Metadata APIs]
+end
 
-    ME --> MM
-    SI --> MM
-    AP --> MM
-    DP --> MM
-    LT --> MM
+%% =======================
+%% Flows
+%% =======================
+DB --> SCHEMA
+DL --> SCHEMA
+DW --> SCHEMA
+ST --> SCHEMA
+API --> SCHEMA
 
-    MM --> MT
-    MT --> VE
-    VE --> ER
-    ER --> WF
+DB --> PIPE
+DL --> PIPE
+DW --> PIPE
 
-    WF --> PUB
-    ETL --> WF
-    API_GW --> WF
+SCHEMA --> LOGICAL
+PIPE --> LINEAGE
+LINEAGE --> LOGICAL
 
-    PUB --> QC
-    QC --> VER
-    VER --> CAT
-    VER --> DP_REG
-    VER --> POL
+LOGICAL --> GLOSSARY
+GLOSSARY --> SERIALIZE
 
-    CAT --> SEARCH
-    DP_REG --> SEARCH
-    POL --> SEARCH
+SERIALIZE --> ODRL
+SERIALIZE --> CONTRACTS
+SERIALIZE --> OWNERS
 
-    CAT --> GOV
-    DP_REG --> GOV
-    POL --> GOV
-    GOV --> COMP
-    COMP --> AUDIT
+ODRL --> SHACL
+CONTRACTS --> SHACL
+OWNERS --> SHACL
+SHACL --> RULES
 
-    style CAT fill:#4A90E2
-    style DP_REG fill:#4A90E2
-    style POL fill:#4A90E2
-    style MM fill:#50C878
-    style WF fill:#50C878
+RULES --> KG
+LINEAGE --> PROV
+PROV --> KG
+
+KG --> CATALOG
+KG --> SEARCH
+KG --> ACCESS
+KG --> APIS
