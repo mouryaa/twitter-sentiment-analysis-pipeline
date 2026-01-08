@@ -1,92 +1,92 @@
 flowchart LR
 
-%% =======================
-%% Domain Layer
-%% =======================
-subgraph Domain["Domain Data Sources (Decentralized)"]
-    DB[(Operational Databases)]
-    DL[(Data Lake Tables)]
-    DW[(Data Warehouse)]
-    ST[(Streaming & Events)]
-    API[(APIs & Services)]
+%% =========================
+%% Domain Data Layer
+%% =========================
+subgraph L1["Domain Data Sources (Decentralized)"]
+    RDBMS[(Operational Databases)]
+    LAKE[(Data Lake Tables)]
+    WH[(Analytical Warehouses)]
+    STREAM[(Streams & Events)]
+    APIS[(APIs & Services)]
 end
 
-%% =======================
-%% Extraction Layer
-%% =======================
-subgraph Extract["Metadata & Model Extraction"]
+%% =========================
+%% Metadata Extraction
+%% =========================
+subgraph L2["Automated Metadata & Model Extraction"]
     SCHEMA[Schema & Structure\nExtractors]
     PIPE[Pipeline & Query\nParsers]
     LINEAGE[Lineage & Provenance\nCollectors]
 end
 
-%% =======================
-%% Normalization Layer
-%% =======================
-subgraph Normalize["Canonical Modeling & Normalization"]
-    LOGICAL[Logical & Semantic\nModel Mapping]
-    GLOSSARY[Business Glossary\nAlignment]
-    SERIALIZE[Metadata Serialization\n]
+%% =========================
+%% Canonical Modeling
+%% =========================
+subgraph L3["Canonical Modeling & Normalization"]
+    PHYS2LOG[Physical → Logical\nModel Mapping]
+    SEMANTIC[Semantic Layer &\nBusiness Glossary]
+    SERIAL[DCAT / DPROD\nSerialization RDF / JSON-LD]
 end
 
-%% =======================
-%% Governance Layer
-%% =======================
-subgraph Govern["Governance, Policy & Contracts"]
-    ODRL[Usage Policies\n]
-    CONTRACTS[Data Contracts\n]
+%% =========================
+%% Governance & Policy
+%% =========================
+subgraph L4["Governance, Policy & Contracts"]
+    ODRL[Usage & Access Policies\n ODRL]
+    CONTRACTS[Data Contracts\nSchema • SLA • SLO]
     OWNERS[Ownership & Stewardship]
 end
 
-%% =======================
-%% Validation Layer
-%% =======================
-subgraph Validate["Validation & Certification"]
-    SHACL[Standards Validation\n]
-    RULES[Quality & Completeness\nRules]
+%% =========================
+%% Validation
+%% =========================
+subgraph L5["Validation & Certification"]
+    SHACL[Standards Validation\n DCAT / DPROD / ODRL]
+    RULES[Completeness &\nQuality Rules]
 end
 
-%% =======================
-%% Graph Backbone
-%% =======================
-subgraph Graph["Metadata Graph Backbone"]
+%% =========================
+%% Metadata Graph
+%% =========================
+subgraph L6["Metadata Graph Backbone"]
     KG[(Knowledge / Metadata Graph)]
-    PROV[Provenance & Lineage\n]
+    PROV[Lineage & Provenance\n PROV-O]
 end
 
-%% =======================
-%% Consumption Layer
-%% =======================
-subgraph Consume["Publishing & Consumption"]
+%% =========================
+%% Consumption
+%% =========================
+subgraph L7["Publishing & Consumption"]
     CATALOG[Central Data Catalog]
-    SEARCH[Discovery & Search]
+    DISCOVERY[Search & Discovery]
     ACCESS[Policy-Aware\nAccess Workflows]
-    APIS[Metadata APIs]
+    METAAPI[Metadata APIs]
 end
 
-%% =======================
+%% =========================
 %% Flows
-%% =======================
-DB --> SCHEMA
-DL --> SCHEMA
-DW --> SCHEMA
-ST --> SCHEMA
-API --> SCHEMA
+%% =========================
+RDBMS --> SCHEMA
+LAKE --> SCHEMA
+WH --> SCHEMA
+STREAM --> SCHEMA
+APIS --> SCHEMA
 
-DB --> PIPE
-DL --> PIPE
-DW --> PIPE
+RDBMS --> PIPE
+LAKE --> PIPE
+WH --> PIPE
 
-SCHEMA --> LOGICAL
 PIPE --> LINEAGE
-LINEAGE --> LOGICAL
+LINEAGE --> PHYS2LOG
+SCHEMA --> PHYS2LOG
 
-LOGICAL --> GLOSSARY
-GLOSSARY --> SERIALIZE
+PHYS2LOG --> SEMANTIC
+SEMANTIC --> SERIAL
 
-SERIALIZE --> ODRL
-SERIALIZE --> CONTRACTS
-SERIALIZE --> OWNERS
+SERIAL --> ODRL
+SERIAL --> CONTRACTS
+SERIAL --> OWNERS
 
 ODRL --> SHACL
 CONTRACTS --> SHACL
@@ -98,6 +98,6 @@ LINEAGE --> PROV
 PROV --> KG
 
 KG --> CATALOG
-KG --> SEARCH
+KG --> DISCOVERY
 KG --> ACCESS
-KG --> APIS
+KG --> METAAPI
