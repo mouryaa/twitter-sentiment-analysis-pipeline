@@ -1,0 +1,97 @@
+graph TB
+    subgraph "Data Sources (Disparate Teams)"
+        DS1[Relational Databases]
+        DS2[Data Lakes/Object Storage]
+        DS3[APIs/Microservices]
+        DS4[File Systems CSV/JSON/Parquet]
+        DS5[NoSQL Databases]
+        DS6[Data Warehouses]
+    end
+
+    subgraph "Extraction Layer"
+        ME[Metadata Extraction Tools]
+        SI[Schema Inference Tools]
+        AP[API Documentation Generators]
+        DP[Database Profiling Tools]
+        LT[Lineage Tracking Tools]
+    end
+
+    subgraph "Transformation & Mapping Layer"
+        MM[Metadata Management Framework]
+        MT[Mapping Templates DCAT/DPROD/ODRL]
+        VE[Validation Engine]
+        ER[Enrichment Rules]
+    end
+
+    subgraph "Integration & Orchestration"
+        ETL[ETL/Data Integration Platform]
+        WF[Workflow Orchestrator]
+        API_GW[API Gateway]
+    end
+
+    subgraph "Publishing Layer"
+        PUB[Publishing Service]
+        QC[Quality Control]
+        VER[Version Control]
+    end
+
+    subgraph "Centralized Data Catalog"
+        CAT[Data Catalog DCAT Compliant]
+        DP_REG[Data Product Registry DPROD]
+        POL[Policy Repository ODRL]
+        SEARCH[Search & Discovery]
+    end
+
+    subgraph "Governance & Monitoring"
+        GOV[Governance Dashboard]
+        COMP[Compliance Monitoring]
+        AUDIT[Audit Logs]
+    end
+
+    DS1 --> ME
+    DS2 --> ME
+    DS3 --> AP
+    DS4 --> SI
+    DS5 --> DP
+    DS6 --> DP
+    
+    DS1 --> LT
+    DS2 --> LT
+    ETL --> LT
+
+    ME --> MM
+    SI --> MM
+    AP --> MM
+    DP --> MM
+    LT --> MM
+
+    MM --> MT
+    MT --> VE
+    VE --> ER
+    ER --> WF
+
+    WF --> PUB
+    ETL --> WF
+    API_GW --> WF
+
+    PUB --> QC
+    QC --> VER
+    VER --> CAT
+    VER --> DP_REG
+    VER --> POL
+
+    CAT --> SEARCH
+    DP_REG --> SEARCH
+    POL --> SEARCH
+
+    CAT --> GOV
+    DP_REG --> GOV
+    POL --> GOV
+    GOV --> COMP
+    COMP --> AUDIT
+
+    style CAT fill:#4A90E2
+    style DP_REG fill:#4A90E2
+    style POL fill:#4A90E2
+    style MM fill:#50C878
+    style WF fill:#50C878
